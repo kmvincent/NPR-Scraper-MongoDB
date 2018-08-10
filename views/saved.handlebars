@@ -1,0 +1,44 @@
+    <div class="navigation">
+        <nav>
+            <ul class="nav nav-pills" style="padding-top:5px;">
+                <li class="nav-item">
+                    <a class="nav-link disabled" style="margin-right:15px; font-size:1.3rem;">Mongo Scraper</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/saved">Saved Articles</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="hero">
+        <div class="jumbotron jumbotron-fluid" style="background-image: url('./images/newspaper.jpg'); " >
+            <div class="container center">
+                <div>
+                    <h1 class="display-4 hero-text forward">Saved Articles</h1>
+                    <p class="lead hero-text forward">Your Saved Articles</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{#each saved}}
+    <div class="card" id={{this._id}}>
+        <div class="card-header" style="background-color: #2f7df6; color: white;">
+            SubCategory
+        </div>
+        <div class="card-body">
+            <div class="info">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p class="card-text">{{this.summary}}</p>
+                <span><a href="{{this.link}}">Full Article</a></span><br>
+                <a href="/saved" class="btn btn-warning ">Article Notes</a>
+                <a href="/saved" class="btn btn-danger">Delete from Saved</a>
+            </div>
+            <div class="image img-thumbnail">
+                <img ssrc="{{this.img}}" width=200px height=200px>
+            </div>  
+        </div>
+    </div>
+    {{/saved}}
