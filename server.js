@@ -55,14 +55,16 @@ app.get("/scrape", function(req, res) {
         result.img = $(this)
             .find("div.item-image")
             .find("div.imagewrap")
-            .children("a")
-            .attr("href");
+            .find("a")
+            .children("img")
+            .attr("src");
+          // console.log("Server: " + result.img)
      
     //Creating Database using Mongo and saving the results from the scraping into the database. 
     // Create a new Article using the `result` object built from scraping
       db.Article.create(result)
         .then(function(dbArticle) {
-          console.log(dbArticle);
+          // console.log(dbArticle);
         })
         .catch(function(err) {
           return res.json(err);
