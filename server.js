@@ -2,7 +2,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
-
+var mongojs = require("mongojs");
 // Scraping tools
 var axios = require("axios");
 var cheerio = require("cheerio");
@@ -17,13 +17,12 @@ var PORT = process.env.PORT || 3000;
 // Morgan Logger logging requests
 app.use(logger("dev"));
 
-
 // Body-parser to handle form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // Connecting Mongo DB
-mongoose.connect("mongodb://localhost/week18Populater");
+mongoose.connect("mongodb://localhost/webScraper");
 
 // Routes
 
@@ -58,20 +57,20 @@ app.get("/scrape", function(req, res) {
             .find("a")
             .children("img")
             .attr("src");
-          // console.log("Server: " + result.img)
+          //console.log("Server: " + result.img) correct
      
     //Creating Database using Mongo and saving the results from the scraping into the database. 
     // Create a new Article using the `result` object built from scraping
       db.Article.create(result)
         .then(function(dbArticle) {
-          // console.log(dbArticle);
+          console.log(dbArticle);
         })
         .catch(function(err) {
           return res.json(err);
         });
     });
     console.log("Scrape Complete");
-    res.redirect("/");
+    // res.redirect("/");
   });
 });
 
@@ -86,7 +85,7 @@ app.get("/articles", function(req, res) {
     });
 });
 
-// Route to get specific article by id
+// Route to get specific article by id (this is for notes)
 app.get("/articles/:id", function(req, res) {
   db.Article.findOne({ _id: req.params.id })
     .populate("note")
@@ -97,39 +96,6 @@ app.get("/articles/:id", function(req, res) {
       res.json(err);
     });
 });
-
-// //Route to get all saved articles
-// app.get("/saved", function (req, res) {
-//     db.Article.find(
-//         { saved: true },
-//         { sort: { created: -1 } }, 
-//         function (err, data) {
-//         if (data.length === 0) {
-//             res.render("placeholder",
-//                 { message: "Uh Oh. Looks like we don't have any saved articles." });
-//         }
-//         else {
-//             res.render("saved", { saved: data });
-//         }
-//     });
-// });
-
-// //Route for saving an article by id
-// app.post("/saved/:id", function (req, res) {
-//     db.Article.findById(req.params.id, function (err, data) {
-//         if (data.saved) {
-//             Article.findByIdAndUpdate(req.params.id, { $set: { saved: false, status: "Save Article" } }, { new: true }, function (err, data) {
-//                 res.redirect("/");
-//             });
-//         }
-//         else {
-//             Article.findByIdAndUpdate(req.params.id, { $set: { saved: true, status: "Saved" } }, { new: true }, function (err, data) {
-//                 res.redirect("/saved");
-//             });
-//         }
-//     });
-// });
-
 
 // // Route for saving/updating an Article's associated Note
 app.post("/articles/:id", function(req, res) {

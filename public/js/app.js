@@ -2,22 +2,41 @@
 $.getJSON("/articles", function(data) {
     // For each one
     for (var i = 0; i < data.length; i++) {
-      // Display the apropos information on the page
-      $("#articles").append("<p data-id='" + data[i]._id + "'>" + data[i].title + "<br/>" + data[i].summary + "</p>");
-      $("#articles").append("<a href='" + data[i].link + "'>Full Article Here</a>");
-      $("#articles").append("<img class='image img-thumbnail' src='" + data[i].img + "' width=200px height=200px>");
+      $("#articles").append(`
+      <div class="card">
+      <div class="card-header subHead">${data[i].subCategory}</div>
+      <div class="card-body">
+        <div class="info">
+            <h5 class="card-title">${data[i].title}</h5>
+            <p class="card-text">${data[i].summary} <span><a href="${data[i].link}">Full Article</a></span></p>
+            <button id="addNote" data-id="${data[i].id}" class="btn btn-primary">Add Note</button>
+        </div>
+        <div class="image img-thumbnail">
+            <img src="${data[i].img}" width=auto height=130px>
+        </div>
+        </div>
+        </div>
+        </div>
+        `)
     }
-    console.log("App:" + data[i].img)
   });
   
-  
-  // Whenever someone clicks a p tag
-  $(document).on("click", "p", function() {
-    // Empty the notes from the note section
+  $(document).on("click", "#scrapeBtn", function(){
+    console.log("clicked")
+    $.ajax({
+        method: "GET",
+        url:"/scrape"
+    })
+  }) .then(function (data) {
+      location.reload ()
+  })
+
+  $(document).on("click", "#addNote", function() {
+    console.log("note btn clicked")
     $("#notes").empty();
     // Save the id from the p tag
     var thisId = $(this).attr("data-id");
-  
+    console.log(thisId)
     // Now make an ajax call for the Article
     $.ajax({
       method: "GET",
@@ -34,14 +53,6 @@ $.getJSON("/articles", function(data) {
         $("#notes").append("<textarea id='bodyinput' name='body'></textarea>");
         // A button to submit a new note, with the id of the article saved to it
         $("#notes").append("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
-  
-        // If there's a note in the article
-        if (data.note) {
-          // Place the title of the note in the title input
-          $("#titleinput").val(data.note.title);
-          // Place the body of the note in the body textarea
-          $("#bodyinput").val(data.note.body);
-        }
       });
   });
   
