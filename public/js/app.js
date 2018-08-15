@@ -1,5 +1,6 @@
 // Grab the articles as a json
 $.getJSON("/articles", function (data) {
+  //console.log(data)
   // For each one
   for (var i = 0; i < data.length; i++) {
     $("#articles").append(`
@@ -9,7 +10,7 @@ $.getJSON("/articles", function (data) {
         <div class="info">
             <h5 class="card-title">${data[i].title}</h5>
             <p class="card-text">${data[i].summary} <span><a href="${data[i].link}">Full Article</a></span></p>
-            <button data-id="${data[i].id}" class="btn btn-primary addNote" data-toggle="modal" data-target="#noteModal">Add Note</button>
+            <button data-id="${data[i]._id}" class="btn btn-primary addNote" data-toggle="modal" data-target="#noteModal">Add Note</button>
         </div>
         <div class="image img-thumbnail">
             <img src="${data[i].img}" width=auto height=130px>
@@ -22,7 +23,6 @@ $.getJSON("/articles", function (data) {
 });
 
 $(document).on("click", "#scrapeBtn", function () {
-  console.log("clicked")
   $.ajax({
     method: "GET",
     url: "/scrape"
@@ -32,11 +32,9 @@ $(document).on("click", "#scrapeBtn", function () {
 })
 
 $(document).on("click", ".addNote", function () {
-  console.log("note btn clicked")
   $("#notes").empty();
   // Save the id from the p tag
   var thisId = $(this).attr("data-id");
-  console.log(thisId)
   // Now make an ajax call for the Article
   $.ajax({
     method: "GET",
@@ -44,15 +42,15 @@ $(document).on("click", ".addNote", function () {
   })
     // With that done, add the note information to the page
     .then(function (data) {
-      console.log(data);
       // The title of the article
-      $(".modal-title").append("<h2>" + data.title + "</h2>");
+      $("#titleModal").text(data.title);
       // An input to enter a new title
-      $("#notes").append("<h2>Title</h2><input id='titleinput' name='title' >");
+      $("#notes").append("<h2>Title</h2><input id='titleinput' name='title'>");
       // A textarea to add a new note body
       $("#notes").append("<h2>Comment</h2><textarea id='bodyinput' name='body'></textarea>");
       // A button to submit a new note, with the id of the article saved to it
-      $(".modal-footer").append("<button type='button' class='btn btn-primary' data-dismiss='modal' data-id='" + data._id + "' id='savenote'>Save Note</button>");
+      $("#savenote").remove()
+      $(".modal-footer").append(`<button type="button" class="btn btn-primary" data-id="${data._id}" data-dismiss="modal" id="savenote">Save Note</button>`)
     });
 });
 
@@ -60,7 +58,6 @@ $(document).on("click", ".addNote", function () {
 $(document).on("click", "#savenote", function () {
   // Grab the id associated with the article from the submit button
   var thisId = $(this).attr("data-id");
-
   // Run a POST request to change the note, using what's entered in the inputs
   $.ajax({
     method: "POST",
@@ -68,6 +65,7 @@ $(document).on("click", "#savenote", function () {
     data: {
       // Value taken from title input
       title: $("#titleinput").val(),
+
       // Value taken from note textarea
       body: $("#bodyinput").val()
     }
